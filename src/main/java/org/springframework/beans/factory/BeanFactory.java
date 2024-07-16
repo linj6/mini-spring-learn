@@ -1,20 +1,19 @@
 package org.springframework.beans.factory;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.beans.BeansException;
 
 /**
  * @author derekyi
  */
-public class BeanFactory {
+public interface BeanFactory {
 
-    private final Map<String, Object> beanMap = new HashMap<>();
+    /**
+     * 获取bean
+     *
+     * @param beanName beanName
+     * @return bean
+     * @throws BeansException bean不存在时
+     */
+    Object getBean(String beanName) throws BeansException;
 
-    public void registerBean(String name, Object bean) {
-        beanMap.put(name, bean);
-    }
-
-    public Object getBean(String name) {
-        return beanMap.get(name);
-    }
 }
