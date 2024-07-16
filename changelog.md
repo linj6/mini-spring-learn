@@ -95,3 +95,30 @@ public class HelloService {
 针对bean的实例化，抽象出一个实例化策略的接口InstantiationStrategy，有两个实现类：
 - SimpleInstantiationStrategy：使用bean的构造函数来实例化
 - CglibSubclassInstantiationStrategy：使用Cglib动态代理来实例化
+
+
+## 为bean填充属性
+> 代码分支：populate-bean-with-property-values
+
+在BeanDefinition中增加Bean属性对应的PropertyValues，实例化bean后，为bean填充属性 AbstractAutowireCapableBeanFactory.applyPropertyValues
+
+测试：
+```
+public class PopulateBeanWithPropertyValuesTest {
+
+    @Test
+    public void testPopulateBeanWithPropertyValues() {
+        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+        PropertyValues propertyValues = new PropertyValues();
+        propertyValues.addPropertyValue(new PropertyValue("name", "昂热"));
+        propertyValues.addPropertyValue(new PropertyValue("age", "100"));
+        beanFactory.registerBeanDefinition("person", new BeanDefinition(Person.class, propertyValues));
+
+        Person person = (Person) beanFactory.getBean("person");
+        System.out.println(person);
+        Assert.assertEquals("昂热", person.getName());
+        Assert.assertEquals(100, person.getAge());
+    }
+
+}
+```
