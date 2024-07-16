@@ -5,6 +5,9 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.test.ioc.service.HelloService;
 
+/**
+ * @author derekyi
+ */
 public class BeanDefinitionAndBeanDefinitionRegistryTest {
 
     @Test
