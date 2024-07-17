@@ -93,16 +93,18 @@ public class HelloService {
 
 ![](./assets/instantiation-stratety.png)
 针对bean的实例化，抽象出一个实例化策略的接口InstantiationStrategy，有两个实现类：
+
 - SimpleInstantiationStrategy：使用bean的构造函数来实例化
 - CglibSubclassInstantiationStrategy：使用Cglib动态代理来实例化
 
-
 ## 为bean填充属性
+
 > 代码分支：populate-bean-with-property-values
 
 在BeanDefinition中增加Bean属性对应的PropertyValues，实例化bean后，为bean填充属性 AbstractAutowireCapableBeanFactory.applyPropertyValues
 
 测试：
+
 ```
 public class PopulateBeanWithPropertyValuesTest {
 
@@ -124,6 +126,7 @@ public class PopulateBeanWithPropertyValuesTest {
 ```
 
 ## 为bean注入bean
+
 > 代码分支：populate-bean-with-bean
 
 增加BeanReference类，包装一个bean对另一个的bean的引用。实例化BeanA后，如果ProperValue#value为BeanReference类型，引用BeanB，则先实例化BeanB，再为BeanA设置属性。
@@ -151,8 +154,8 @@ protected void applyPropertyValues(String beanName, Object bean, BeanDefinition 
 }
 ```
 
-
 测试：
+
 ```
 public class PopulateBeanWithPropertyValuesTest {
 
@@ -186,6 +189,55 @@ public class PopulateBeanWithPropertyValuesTest {
         Assert.assertNotNull(person.getCar());
         Assert.assertEquals("tesla", person.getCar().getBrand());
 
+    }
+
+}
+
+```
+
+## 资源和资源加载器
+
+> 代码分支：resource-and-resource-loader
+
+Resource是资源的抽象和访问接口，有三个实现类：
+![](./assets/resource-and-resouce-loader.png)
+
+- FileSystemResource：文件系统资源的实现类
+- ClassPathResource：classpath下的资源实现类
+- UrlResource：对java.net.Url进行资源定位的实现类
+
+ResourceLoader是资源查找定位策略的抽象，DefaultResourceLoader是其默认实现类
+![](./assets/resource-and-resouce-loader-2.png)
+
+测试：
+
+```
+public class ResourceAndResourceLoader {
+
+    @Test
+    public void testResourceLoader() throws IOException {
+        DefaultResourceLoader resourceLoader = new DefaultResourceLoader();
+
+        // 加载classpath下的资源
+        Resource resource = resourceLoader.getResource("classpath:hello.txt");
+        InputStream inputStream = resource.getInputStream();
+        String content = IoUtil.read(inputStream, StandardCharsets.UTF_8);
+        System.out.println(content);
+        Assert.assertEquals("hello world", content);
+
+        // 加载文件系统资源
+        resource = resourceLoader.getResource("src/test/resources/hello.txt");
+        inputStream = resource.getInputStream();
+        content = IoUtil.read(inputStream, StandardCharsets.UTF_8);
+        System.out.println(content);
+        Assert.assertEquals("hello world", content);
+
+        // 加载url资源
+        resource = resourceLoader.getResource("https://www.baidu.com");
+        inputStream = resource.getInputStream();
+        content = IoUtil.read(inputStream, StandardCharsets.UTF_8);
+        System.out.println(content);
+        Assert.assertTrue(content.contains("百度一下，你就知道"));
     }
 
 }
